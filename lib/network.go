@@ -83,6 +83,9 @@ func (this *Network) Learn(data []FLOAT) {
 
 // PrintState - Print network state to the console
 func (this *Network) PrintState() {
+	if !PRINT_ON {
+		return
+	}
 	for i := 0; i < len(this.Layers); i++ {
 		layer := this.Layers[i]
 		Pf("%-10s", layer.Name)

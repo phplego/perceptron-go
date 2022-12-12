@@ -60,8 +60,10 @@ func (this *Perceptron) _calculateResult() FLOAT {
 }
 
 func (this *Perceptron) UpdateWeights() {
-	Pf(C_BLUE+C_BOLD+"%-7s"+C_RST, this.Name)
-	Pf(C_MAGENTA+" update_weights: error: "+C_RST+C_RED+"%+05.2f"+C_RST+" weights: ", this.Error)
+	if PRINT_ON {
+		Pf(C_BLUE+C_BOLD+"%-7s"+C_RST, this.Name)
+		Pf(C_MAGENTA+" update_weights: error: "+C_RST+C_RED+"%+05.2f"+C_RST+" weights: ", this.Error)
+	}
 
 	// weight correction formula
 	correct_weight := func(rate, old_weight, err, result, input FLOAT) FLOAT {
@@ -72,18 +74,24 @@ func (this *Perceptron) UpdateWeights() {
 	for i := 0; i < this.InputCount; i++ {
 		old_weight := this.Weights[i]
 		this.Weights[i] = correct_weight(G_learning_rate, this.Weights[i], this.Error, this.Result, *this.Inputs[i])
-		Pf("w%+5.3f", this.Weights[i])
-		Pf(C_CYAN+"Δ%+.0fm "+C_RST, (this.Weights[i]-old_weight)*1000)
+		if PRINT_ON {
+			Pf("w%+5.3f", this.Weights[i])
+			Pf(C_CYAN+"Δ%+.0fm "+C_RST, (this.Weights[i]-old_weight)*1000)
+		}
 	}
 
 	// correct bias same way as other weights have been corrected
 	old_bias := this.Bias
 	this.Bias = correct_weight(G_learning_rate, this.Bias, this.Error, this.Result, 1)
-	PfGray("b%+.2f", this.Bias)
-	PfGray(C_CYAN2+"Δ%+.0fm "+C_RST, (this.Bias-old_bias)*1000)
+	if PRINT_ON {
+		PfGray("b%+.2f", this.Bias)
+		PfGray(C_CYAN2+"Δ%+.0fm "+C_RST, (this.Bias-old_bias)*1000)
+	}
 
-	new_result := this._calculateResult()
-	PfBlue("NR: %+.2fΔ%+0.fm \n", new_result, (this.Result-new_result)*1000)
+	if PRINT_ON {
+		new_result := this._calculateResult()
+		PfBlue("NR: %+.2fΔ%+0.fm \n", new_result, (this.Result-new_result)*1000)
+	}
 }
 
 func (this *Perceptron) ActivationFunc(x FLOAT) FLOAT {

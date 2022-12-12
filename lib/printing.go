@@ -31,6 +31,7 @@ const (
 var PRINT_ON = true // add ability to turn off printf globally
 
 func Pf(format string, va ...any) {
+	//return
 	if PRINT_ON {
 		fmt.Printf(format, va...)
 	}

@@ -2,11 +2,14 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
+	"log"
 	"math"
 	"math/rand"
 	"os"
 	. "perceptron-go/lib"
+	"runtime/pprof"
 	"strconv"
 	"time"
 )
@@ -116,7 +119,20 @@ func print_results(vert_value FLOAT, horz_value FLOAT) {
 	Pf("\n")
 }
 
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+
 func main() {
+
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	Pf("Usage: %s [activation-function] [seed] [epoches] \n", os.Args[0])
 	start_time := time.Now()
 	seed := time.Now().Unix()
@@ -159,16 +175,17 @@ func main() {
 			//PRINT_ON = epoch > total_epoches - 10;    // print only last 10 epoches
 			PRINT_ON = (epoch+1)%1000 == 0 // print every 1000-th epoch
 
-			PfGreen("\nepoch %d  sample #%d\n", epoch, sample)
-
-			for k := 0; k < 9; k++ { // print sample square
-				if (k)%3 == 0 {
-					Pf("\n")
-				}
-				if learn_data[sample].data[k] > 0.5 {
-					Pf("%s ", "◼")
-				} else {
-					Pf("%s ", "◻")
+			if PRINT_ON {
+				PfGreen("\nepoch %d  sample #%d\n", epoch, sample)
+				for k := 0; k < 9; k++ { // print sample square
+					if (k)%3 == 0 {
+						Pf("\n")
+					}
+					if learn_data[sample].data[k] > 0.5 {
+						Pf("%s ", "◼")
+					} else {
+						Pf("%s ", "◻")
+					}
 				}
 			}
 
@@ -186,7 +203,9 @@ func main() {
 			net.Learn(learn_data[sample].expectedResult[:])
 			train_count++
 
-			Pf("error sum: "+C_RED+"%+.3f  "+C_RST+" outerr:"+C_YELLOW+" %.3f"+C_RST+"\n", net.ErrorSum(), net.OutLayer().ErrorSum())
+			if PRINT_ON {
+				Pf("error sum: "+C_RED+"%+.3f  "+C_RST+" outerr:"+C_YELLOW+" %.3f"+C_RST+"\n", net.ErrorSum(), net.OutLayer().ErrorSum())
+			}
 
 			// save charts
 			fmt.Fprintf(file_errors_summary, "%f %f\n", net.ErrorSum(), net.OutLayer().ErrorSum())
@@ -195,7 +214,9 @@ func main() {
 		}
 		fmt.Fprintf(file_errors_by_sample, "\n")
 
-		Pf("epoch_out_err_max: "+C_BG_BLUE+" %.3f "+C_RST+" seed: %d\n", epoch_out_err_max, seed)
+		if PRINT_ON {
+			Pf("epoch_out_err_max: "+C_BG_BLUE+" %.3f "+C_RST+" seed: %d\n", epoch_out_err_max, seed)
+		}
 	}
 
 	//_ = file_errors_by_sample.Close()

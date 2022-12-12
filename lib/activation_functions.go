@@ -10,8 +10,14 @@ type ActivationBundle struct {
 
 var ActivationBundles = []ActivationBundle{
 	ActivationBundle{ // Sigmoid / Logistic Function
-		Name:       "Sigmoid",
-		activation: func(x FLOAT) FLOAT { return FLOAT(1.0 / (1.0 + math.Exp(float64(-x)))) },
+		Name: "Sigmoid",
+		activation: func(x FLOAT) FLOAT {
+			//for i := 0; i < 10000; i++ {
+			//	a := 7 * 10
+			//	a++
+			//}
+			return FLOAT(1.0 / (1.0 + math.Exp(float64(-x))))
+		},
 		derivative: func(y FLOAT) FLOAT { return y * (1.0 - y) },
 	},
 }
