@@ -38,7 +38,6 @@ func NewPerceptron(name string, inputCount int) *Perceptron {
 func (this *Perceptron) CalculateAndUpdateResult() {
 	if this.InputCount == 0 {
 		PfYellow("[Name=%s] Warning: unable to calculate result. No inputs. Skipping.\n", this.Name)
-		panic(111)
 		return
 	}
 	this.Result = this._calculateResult()

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"math"
 	"math/rand"
@@ -145,8 +146,10 @@ func main() {
 	net.CreateLayer("hidd2", 3)
 	net.CreateLayer("out", 2) // two neurons at the output
 
-	file_errors_by_sample, _ := os.OpenFile("plot1.data", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
-	file_errors_summary, _ := os.OpenFile("plot2.data", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
+	file_errors_by_sample_, _ := os.OpenFile("plot1.data", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
+	file_errors_by_sample := bufio.NewWriter(file_errors_by_sample_)
+	file_errors_summary_, _ := os.OpenFile("plot2.data", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
+	file_errors_summary := bufio.NewWriter(file_errors_summary_)
 
 	// learn cycle
 	for epoch := 0; epoch < total_epoches; epoch++ {
@@ -195,8 +198,8 @@ func main() {
 		Pf("epoch_out_err_max: "+C_BG_BLUE+" %.3f "+C_RST+" seed: %d\n", epoch_out_err_max, seed)
 	}
 
-	_ = file_errors_by_sample.Close()
-	_ = file_errors_summary.Close()
+	//_ = file_errors_by_sample.Close()
+	//_ = file_errors_summary.Close()
 	PRINT_ON = true
 
 	Pf("Samples count: %d\n", len(learn_data))
