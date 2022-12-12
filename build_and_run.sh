@@ -7,7 +7,7 @@ fi
 
 if [[ $? -eq 0 ]]
 then
-    ./plot2.sh
+    ./plot1.sh
 fi
 
 

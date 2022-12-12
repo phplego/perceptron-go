@@ -197,6 +197,7 @@ func main() {
 	_ = file_errors_summary.Close()
 	PRINT_ON = true
 
+	Pf("Samples count: %d\n", len(learn_data))
 	Pf("Used Activation function: "+C_BG_RED+" %s "+C_RST, GetCurrentActivationBundle().Name)
 	Pf(" LR: "+C_BG_YELL+" %g "+C_RST+"\n", G_learning_rate)
 }
