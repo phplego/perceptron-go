@@ -117,9 +117,10 @@ func print_results(vert_value FLOAT, horz_value FLOAT) {
 
 func main() {
 	Pf("Usage: %s [activation-function] [seed] [epoches] \n", os.Args[0])
-
+	start_time := time.Now()
 	seed := time.Now().Unix()
 	total_epoches := 3000
+	train_count := 0
 
 	if len(os.Args) > 1 {
 		Pf("Using activation function: %s\n", os.Args[1])
@@ -180,6 +181,7 @@ func main() {
 
 			// lear the sample
 			net.Learn(learn_data[sample].expectedResult[:])
+			train_count++
 
 			Pf("error sum: "+C_RED+"%+.3f  "+C_RST+" outerr:"+C_YELLOW+" %.3f"+C_RST+"\n", net.ErrorSum(), net.OutLayer().ErrorSum())
 
@@ -200,4 +202,7 @@ func main() {
 	Pf("Samples count: %d\n", len(learn_data))
 	Pf("Used Activation function: "+C_BG_RED+" %s "+C_RST, GetCurrentActivationBundle().Name)
 	Pf(" LR: "+C_BG_YELL+" %g "+C_RST+"\n", G_learning_rate)
+	Pf("train count: %d\n", train_count)
+	Pf("train count / ms: %g\n", float64(train_count)/time.Now().Sub(start_time).Seconds()/1000)
+	Pf("exec time: %g sec\n", time.Now().Sub(start_time).Seconds())
 }
