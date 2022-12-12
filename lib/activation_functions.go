@@ -3,14 +3,14 @@ package perceptron_go
 import "math"
 
 type ActivationBundle struct {
-	name       string
+	Name       string
 	activation func(FLOAT) FLOAT
 	derivative func(FLOAT) FLOAT
 }
 
 var ActivationBundles = []ActivationBundle{
 	ActivationBundle{ // Sigmoid / Logistic Function
-		name:       "Sigmoid",
+		Name:       "Sigmoid",
 		activation: func(x FLOAT) FLOAT { return FLOAT(1.0 / (1.0 + math.Exp(float64(-x)))) },
 		derivative: func(y FLOAT) FLOAT { return y * (1.0 - y) },
 	},

@@ -71,7 +71,7 @@ func (this *Layer) FindErrors() {
 
 			// sum next layer (errors*weight)
 			calculated_error += myweight * this.NextLayer.Perceptrons[n].Error
-			//pf_green("findErrors: [%s] i=%d n=%d calculated=%f myweight=%f %s_Layer->perceptrons[%d]->error=%f\n", this->name, i, n, calculated_error, myweight, this->nextLayer->name, n, this->nextLayer->perceptrons[n]->error);
+			//pf_green("findErrors: [%s] i=%d n=%d calculated=%f myweight=%f %s_Layer->perceptrons[%d]->error=%f\n", this->Name, i, n, calculated_error, myweight, this->nextLayer->Name, n, this->nextLayer->perceptrons[n]->error);
 		}
 
 		// set new error value

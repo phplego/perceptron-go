@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"os"
@@ -143,6 +144,10 @@ func main() {
 	net.CreateLayer("hidd2", 3)
 	net.CreateLayer("out", 2) // two neurons at the output
 
+	file_errors_by_sample, _ := os.OpenFile("plot1.data", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
+	file_errors_summary, _ := os.OpenFile("plot2.data", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
+
+	// learn cycle
 	for epoch := 0; epoch < total_epoches; epoch++ {
 		epoch_out_err_max := 0.0
 
@@ -178,8 +183,20 @@ func main() {
 
 			Pf("error sum: "+C_RED+"%+.3f  "+C_RST+" outerr:"+C_YELLOW+" %.3f"+C_RST+"\n", net.ErrorSum(), net.OutLayer().ErrorSum())
 
+			// save charts
+			fmt.Fprintf(file_errors_summary, "%f %f\n", net.ErrorSum(), net.OutLayer().ErrorSum())
+			fmt.Fprintf(file_errors_by_sample, "%f ", net.OutLayer().ErrorAbsSum())
 			epoch_out_err_max = math.Max(float64(epoch_out_err_max), float64(net.OutLayer().ErrorAbsSum()))
 		}
+		fmt.Fprintf(file_errors_by_sample, "\n")
+
 		Pf("epoch_out_err_max: "+C_BG_BLUE+" %.3f "+C_RST+" seed: %d\n", epoch_out_err_max, seed)
 	}
+
+	_ = file_errors_by_sample.Close()
+	_ = file_errors_summary.Close()
+	PRINT_ON = true
+
+	Pf("Used Activation function: "+C_BG_RED+" %s "+C_RST, GetCurrentActivationBundle().Name)
+	Pf(" LR: "+C_BG_YELL+" %g "+C_RST+"\n", G_learning_rate)
 }
