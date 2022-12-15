@@ -170,6 +170,7 @@ func (this *Network) SaveWeights(filename string) error {
 	return nil
 }
 
+// LoadWeights - Load network state (weights + biases) from the file
 func (this *Network) LoadWeights(filename string) error {
 	// calculate buffer size
 	values_count := 0
