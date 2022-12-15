@@ -162,10 +162,19 @@ func main() {
 	net.CreateLayer("hidd2", 3)
 	net.CreateLayer("out", 2) // two neurons at the output
 
+	if _, err := os.Stat("weights.txt"); err == nil {
+		err := net.LoadWeights("weights.txt")
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	file_errors_by_sample_, _ := os.OpenFile("plot1.data", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
 	file_errors_by_sample := bufio.NewWriter(file_errors_by_sample_)
 	file_errors_summary_, _ := os.OpenFile("plot2.data", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
 	file_errors_summary := bufio.NewWriter(file_errors_summary_)
+	defer file_errors_by_sample_.Close()
+	defer file_errors_summary_.Close()
 
 	// learn cycle
 	for epoch := 0; epoch < total_epoches; epoch++ {
@@ -219,8 +228,11 @@ func main() {
 		}
 	}
 
-	//_ = file_errors_by_sample.Close()
-	//_ = file_errors_summary.Close()
+	err := net.SaveWeights("weights.txt")
+	if err != nil {
+		panic(err)
+	}
+
 	PRINT_ON = true
 
 	Pf("Samples count: %d\n", len(learn_data))

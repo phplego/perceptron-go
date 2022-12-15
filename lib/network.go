@@ -1,5 +1,14 @@
 package perceptron_go
 
+import (
+	"bytes"
+	"encoding/binary"
+	"errors"
+	"fmt"
+	"os"
+	"unsafe"
+)
+
 type Network struct {
 	Name   string
 	Layers []*Layer
@@ -116,4 +125,89 @@ func (this *Network) SetInputValue(index int, value FLOAT) {
 	}
 
 	this.InputLayer().Perceptrons[index].Result = value
+}
+
+// SaveWeights - Save network state (weights + biases) to the file
+func (this *Network) SaveWeights(filename string) error {
+	// calculate buffer size
+	values_count := 0
+	for l := 1; /*skip input layer*/ l < len(this.Layers); l++ {
+		layer := this.Layers[l]
+		for p := 0; p < len(layer.Perceptrons); p++ {
+			perceptron := layer.Perceptrons[p]
+			values_count += len(perceptron.Weights)
+			values_count += 1 // and bias
+		}
+	}
+
+	buf_size := values_count * int(unsafe.Sizeof(FLOAT(0)))
+
+	//buf := make([]byte, buf_size)
+	var buf bytes.Buffer
+
+	for l := 1; /*skip input layer*/ l < len(this.Layers); l++ {
+		layer := this.Layers[l]
+		for p := 0; p < len(layer.Perceptrons); p++ {
+			perceptron := layer.Perceptrons[p]
+
+			for w := 0; w < len(perceptron.Weights); w++ { // save weights
+				binary.Write(&buf, binary.LittleEndian, perceptron.Weights[w])
+			}
+			binary.Write(&buf, binary.LittleEndian, perceptron.Bias) // save bias
+		}
+	}
+
+	if buf.Len() != buf_size {
+		return errors.New("wrong size1")
+	}
+
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o664)
+	defer file.Close()
+	if err != nil {
+		return err
+	}
+	file.Write(buf.Bytes())
+	return nil
+}
+
+func (this *Network) LoadWeights(filename string) error {
+	// calculate buffer size
+	values_count := 0
+	for l := 1; /*skip input layer*/ l < len(this.Layers); l++ {
+		layer := this.Layers[l]
+		for p := 0; p < len(layer.Perceptrons); p++ {
+			perceptron := layer.Perceptrons[p]
+			values_count += len(perceptron.Weights)
+			values_count += 1 // and bias
+		}
+	}
+
+	buf_size := values_count * int(unsafe.Sizeof(FLOAT(0)))
+
+	file, err := os.OpenFile(filename, os.O_RDONLY, 0o664)
+	if err != nil {
+		return err
+	}
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return err
+	}
+
+	if fileInfo.Size() != int64(buf_size) {
+		return fmt.Errorf("Size of network (%v) does not match file size (%v)", buf_size, fileInfo.Size())
+	}
+
+	for l := 1; /*skip input layer*/ l < len(this.Layers); l++ {
+		layer := this.Layers[l]
+		for p := 0; p < len(layer.Perceptrons); p++ {
+			perceptron := layer.Perceptrons[p]
+
+			for w := 0; w < len(perceptron.Weights); w++ { // save weights
+				binary.Read(file, binary.LittleEndian, &perceptron.Weights[w])
+			}
+			binary.Read(file, binary.LittleEndian, &perceptron.Bias)
+		}
+	}
+
+	return nil
 }
