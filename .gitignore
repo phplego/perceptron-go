@@ -1,4 +1,5 @@
 .idea
-/*.log
-/*.data
+*.data
+*.save
 /perceptron-go
+/test/test_4.data.sh

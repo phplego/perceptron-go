@@ -119,13 +119,13 @@ func print_results(vert_value FLOAT, horz_value FLOAT) {
 	Pf("\n")
 }
 
-var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+var gCPUprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
 func main() {
 
 	flag.Parse()
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
+	if *gCPUprofile != "" {
+		f, err := os.Create(*gCPUprofile)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -141,7 +141,8 @@ func main() {
 
 	if len(os.Args) > 1 {
 		Pf("Using activation function: %s\n", os.Args[1])
-		// todo: implement
+		index, _ := strconv.Atoi(os.Args[1])
+		CurrentActivationBundleIndex = index
 	}
 	if len(os.Args) > 2 {
 		Pf("Using seed: %s\n", os.Args[2])
@@ -162,8 +163,8 @@ func main() {
 	net.CreateLayer("hidd2", 3)
 	net.CreateLayer("out", 2) // two neurons at the output
 
-	if _, err := os.Stat("weights.txt"); err == nil {
-		err := net.LoadWeights("weights.txt")
+	if _, err := os.Stat("weights.save"); err == nil {
+		err := net.LoadWeights("weights.save")
 		if err != nil {
 			panic(err)
 		}
@@ -228,17 +229,19 @@ func main() {
 		}
 	}
 
-	err := net.SaveWeights("weights.txt")
+	err := net.SaveWeights("weights.save")
 	if err != nil {
 		panic(err)
 	}
 
 	PRINT_ON = true
 
+	speed := float64(train_count) / time.Now().Sub(start_time).Seconds() / 1000
+	speed = math.Round(speed)
 	Pf("Samples count: %d\n", len(learn_data))
 	Pf("Used Activation function: "+C_BG_RED+" %s "+C_RST, GetCurrentActivationBundle().Name)
-	Pf(" LR: "+C_BG_YELL+" %g "+C_RST+"\n", G_learning_rate)
+	Pf("  LR: "+C_BG_YELL+" %g "+C_RST, G_learning_rate)
+	Pf("  speed: "+C_BG_MAG+" %g "+C_RST+" train/ms\n", speed)
 	Pf("train count: %d\n", train_count)
-	Pf("train count / ms: %g\n", float64(train_count)/time.Now().Sub(start_time).Seconds()/1000)
 	Pf("exec time: %g sec\n", time.Now().Sub(start_time).Seconds())
 }

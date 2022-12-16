@@ -4,21 +4,82 @@ import "math"
 
 type ActivationBundle struct {
 	Name       string
-	activation func(FLOAT) FLOAT
-	derivative func(FLOAT) FLOAT
+	Activation func(FLOAT) FLOAT
+	Derivative func(FLOAT) FLOAT
 }
 
 var ActivationBundles = []ActivationBundle{
 	ActivationBundle{ // Sigmoid / Logistic Function
 		Name: "Sigmoid",
-		activation: func(x FLOAT) FLOAT {
-			//for i := 0; i < 10000; i++ {
-			//	a := 7 * 10
-			//	a++
-			//}
+		Activation: func(x FLOAT) FLOAT {
 			return FLOAT(1.0 / (1.0 + math.Exp(float64(-x))))
 		},
-		derivative: func(y FLOAT) FLOAT { return y * (1.0 - y) },
+		Derivative: func(y FLOAT) FLOAT { return y * (1.0 - y) },
+	},
+	ActivationBundle{ // Tanh(x)
+		Name: "Tanh(x)",
+		Activation: func(x FLOAT) FLOAT {
+			return FLOAT(1.0 / (1.0 + math.Exp(float64(-2*x))))
+		},
+		Derivative: func(y FLOAT) FLOAT { return y * (1.0 - y*y) },
+	},
+	ActivationBundle{ // Leaky ReLU
+		Name: "L-ReLU",
+		Activation: func(x FLOAT) FLOAT {
+			if x < 0.0 {
+				return 0.01
+			}
+			return x
+		},
+		Derivative: func(y FLOAT) FLOAT {
+			if y < 0.0 {
+				return 0.01
+			}
+			return 1.0
+		},
+	},
+	ActivationBundle{ // Leaky Capped ReLU
+		Name: "LC-ReLU",
+		Activation: func(x FLOAT) FLOAT {
+			if x >= 0.0 {
+				if x > 1.0 {
+					return 1 + 0.01*(x-1)
+				} else {
+					return x
+				}
+			} else {
+				return 0.01 * x
+			}
+		},
+		Derivative: func(y FLOAT) FLOAT {
+			if y < 0.0 || y > 1.0 {
+				return 0.01
+			} else {
+				return 1.0
+			}
+		},
+	},
+
+	ActivationBundle{ // Experimental
+		Name: "Experimental",
+		Activation: func(x FLOAT) FLOAT {
+			if x >= 0.0 {
+				if x > 1.0 {
+					return 1
+				} else {
+					return x
+				}
+			} else {
+				return 0.01 * x
+			}
+		},
+		Derivative: func(y FLOAT) FLOAT {
+			if y < 0.0 || y > 1.0 {
+				return 0.01
+			} else {
+				return 1.0
+			}
+		},
 	},
 }
 

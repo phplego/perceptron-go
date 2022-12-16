@@ -16,7 +16,6 @@ type Perceptron struct {
 	Bias       FLOAT
 	Error      FLOAT
 	Result     FLOAT
-	//ActivationFunc func(FLOAT) FLOAT //todo: initialize
 }
 
 func NewPerceptron(name string, inputCount int) *Perceptron {
@@ -56,7 +55,7 @@ func (this *Perceptron) _calculateResult() FLOAT {
 	}
 	sum += this.Bias
 
-	return this.ActivationFunc(sum)
+	return this.activate(sum)
 }
 
 func (this *Perceptron) UpdateWeights() {
@@ -67,7 +66,7 @@ func (this *Perceptron) UpdateWeights() {
 
 	// weight correction formula
 	correct_weight := func(rate, old_weight, err, result, input FLOAT) FLOAT {
-		return old_weight + rate*err*this.DerivativeFunc(result)*input
+		return old_weight + rate*err*this.derivative(result)*input
 	}
 
 	// update weights
@@ -94,12 +93,12 @@ func (this *Perceptron) UpdateWeights() {
 	}
 }
 
-func (this *Perceptron) ActivationFunc(x FLOAT) FLOAT {
-	return GetCurrentActivationBundle().activation(x)
+func (this *Perceptron) activate(x FLOAT) FLOAT {
+	return GetCurrentActivationBundle().Activation(x)
 	//return FLOAT(1.0 / (1.0 + math.Exp(float64(-x))))
 }
 
-func (this *Perceptron) DerivativeFunc(y FLOAT) FLOAT {
-	return GetCurrentActivationBundle().derivative(y)
+func (this *Perceptron) derivative(y FLOAT) FLOAT {
+	return GetCurrentActivationBundle().Derivative(y)
 	//return y * (1.0 - y)
 }
