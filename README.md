@@ -1,6 +1,9 @@
 # perceptron-go
 Neural network library
 
+It is Golang version of https://github.com/phplego/perceptron (C++)
+
+
 ### Buld and run
 ```sell
 go build
